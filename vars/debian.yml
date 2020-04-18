@@ -1,0 +1,5 @@
+---
+# roles/ssl/vars/debian.yml
+
+# Debian specific vars
+ssl_package_extension: 'deb'

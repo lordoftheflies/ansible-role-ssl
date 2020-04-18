@@ -1,0 +1,237 @@
+---
+# roles/ssl/defaults/main.yml
+
+ssl_debug: false
+
+ssl_controller_user: '{{ project_controller_user }}'
+ssl_controller_home: '{{ project_controller_home }}'
+ssl_controller_resources_root: '{{ project_controller_resources_home }}'
+
+ssl_deployment_user: '{{ project_deployment_user }}'
+ssl_deployment_home: '{{ project_deployment_home }}'
+ssl_deployment_resources_root: '{{ project_deployment_resources_home }}'
+
+## atomic versioning example
+#
+# ssl_major: '0'
+# ssl_moderate_revision: '0'
+# ssl_minor_revision: '1'
+# ssl_build: ''
+
+## Package #
+
+ssl_package_state: 'present'
+ssl_package_version: '2.0.1'
+ssl_package_filename: "vagrant_{{ ssl_package_version }}_i686.deb"
+
+ssl_controller_resources_dir: '{{ ssl_controller_resources_root }}/sw/vagrant/debs'
+ssl_deployment_resources_dir: '{{ ssl_deployment_resources_root }}/vagrant/debs'
+
+# /tests/sw/{{ ansible_distribution| lower }}/{{ ansible_distribution_version }}/miniconda'
+
+# Help file
+
+ssl_acemenu_help_file_template_path: '{{ fact_role_path }}/templates/bin/acemenu/help/example_aceadmin_helpfile.md.j2'
+
+# Resources
+
+ssl_package_url: "https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_i686.deb"
+# ssl_checksum_url: "https://releases.hashicorp.com/vagrant/2.0.1/ vagrant_2.0.1_SHA256SUMS"
+# ssl_checksum_sig_url: "https://releases.hashicorp.com/vagrant/2.0.1/ vagrant_2.0.1_SHA256SUMS.sig"
+
+## links
+
+ssl_default_link_force: true
+
+########################################
+
+# Resources
+
+ssl_resources_on_local:
+
+  ssl_local_directories:
+
+    state: 'directory'
+    path: '{{ ssl_controller_resources_dir }}'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0755'
+
+  ssl_local_clones:
+
+    become: ''
+    repo: 'https://github.com/cjsteel/script-bash-acemenu.git'
+    dest: '{{ ssl_controller_resources_dir }}/acemenu'
+    mode: '0700'
+    clone: true
+
+  ssl_local_downloads:
+
+    url: 'https://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh'
+    dest: '{{ ssl_controller_resources_dir }}/Miniconda2-latest-Linux-x86_64.sh'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0700'
+    checksum: 'md5:bd1655b4b313f7b2a1f2e15b7b925d03'
+    resource_type: 'url'
+
+  ssl_local_file_copies:
+
+    state: "copy"
+    src: './files/example_playbook.yml'
+    dest: '{{ ssl_controller_resources_dir }}/copy_test.yml'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0700'
+
+  ssl_local_file_touches:
+
+    state: 'touch'
+    path: '{{ ssl_controller_resources_dir }}/copy_test.yml'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0770'
+
+  ssl_local_templated_files:
+
+
+    state: 'template'
+    src: './templates/template_test.md.j2'
+    dest: '{{ ssl_controller_resources_dir }}/test.md'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0700'
+
+  ssl_local_blocksinfile:
+
+    type: 'blockinfile'
+    path: '{{ ssl_controller_resources_dir }}/test.md'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0700'
+    insertafter: "EOF"
+    block: |
+      # if running bash
+      if [ -n "$BASH_VERSION" ]; then
+          # include /opt/display/bin/display if it exists
+          if [ -f "/opt/display/bin/display" ]; then
+              PATH="/opt/display/bin:$PATH"
+
+       	. "/opt/display/bin/"
+          fi
+      fi
+    state: "present"
+
+  ssl_local_standard_sym_links:
+
+    state: "link"
+    src: '{{ ssl_controller_resources_dir }}/test.md'
+    dest: '{{ ssl_controller_resources_dir }}/my_local_link'
+    owner: '{{ ssl_controller_user }}'
+    group: '{{ ssl_controller_user }}'
+    mode: '0700'
+    force: '{{ ssl_default_link_force }}'
+
+  ssl_local_relative_sym_links:
+
+    link_name: 'relative_link'
+    link_target: 'test.md'
+    link_dir: '{{ ssl_controller_resources_dir }}'
+    state: 'relative_link'
+#    owner: '{{ ssl_controller_user }}'
+#    group: '{{ ssl_controller_user }}'
+#    mode: '0700'
+
+ssl_resources_on_remote:
+
+  ssl_remote_directories:
+
+    state: 'directory'
+    path: '{{ ssl_deployment_resources_dir }}'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0755'
+
+  ssl_remote_clones:
+
+    become: true
+    repo: 'https://github.com/cjsteel/script-bash-acemenu.git'
+    dest: '{{ ssl_deployment_resources_dir }}/acemenu'
+    mode: '0700'
+    clone: true
+
+  ssl_remote_downloads:
+
+    url: 'https://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh'
+    dest: '{{ ssl_deployment_resources_dir }}/Miniconda2-latest-Linux-x86_64.sh'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'
+    checksum: 'md5:bd1655b4b313f7b2a1f2e15b7b925d03'
+    resource_type: 'url'
+
+  ssl_remote_file_copies:
+
+    state: "copy"
+    src: './files/example_playbook.yml'
+    dest: '{{ ssl_deployment_resources_dir }}/copy_test.yml'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'
+
+  ssl_remote_file_touches:
+
+    state: 'touch'
+    path: '{{ ssl_deployment_resources_dir }}/copy_test.yml'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0770'
+
+  ssl_remote_templates_files:
+
+    state: 'template'
+    src: './templates/template_test.md.j2'
+    dest: '{{ ssl_deployment_resources_dir }}/test.md'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'
+
+  ssl_remote_blocksinfile:
+
+    type: 'blockinfile'
+    path: '{{ ssl_deployment_resources_dir }}/test.md'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'
+    insertafter: "EOF"
+    block: |
+      # if running bash
+      if [ -n "$BASH_VERSION" ]; then
+          # include /opt/display/bin/display if it exists
+          if [ -f "/opt/display/bin/display" ]; then
+              PATH="/opt/display/bin:$PATH"
+
+       	. "/opt/display/bin/"
+          fi
+      fi
+    state: "present"
+
+  ssl_remote_standard_sym_links:
+
+    state: 'link'
+    src: '{{ ssl_deployment_resources_dir }}/test.md'
+    dest: '{{ ssl_deployment_resources_dir }}/my_remote_link'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'
+    force: '{{ ssl_default_link_force }}'
+
+  ssl_remote_relative_sym_links:
+
+    state: 'relative_link'
+    link_dir: '{{ ssl_deployment_resources_dir }}'
+    link_name: 'my_relative_link'
+    link_target: 'test.md'
+    owner: '{{ ssl_deployment_user }}'
+    group: '{{ ssl_deployment_user }}'
+    mode: '0700'

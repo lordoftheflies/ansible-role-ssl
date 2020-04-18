@@ -1,0 +1,4 @@
+---
+# roles/ssl/vars/debian.yml
+
+ssl_package_extension: 'rpm'
