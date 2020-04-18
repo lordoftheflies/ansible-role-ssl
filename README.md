@@ -3,7 +3,7 @@ title: 'Role for ssl'
 description: 'Quickstart and examples for demonstrating the role capabilities.'
 ---
 
-# Ansible Role: Ssl
+# Ansible Role: SSL
 
 ## Status
 
