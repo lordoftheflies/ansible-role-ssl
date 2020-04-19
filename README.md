@@ -3,11 +3,11 @@ title: 'Role for ssl'
 description: 'Quickstart and examples for demonstrating the role capabilities.'
 ---
 
-# Ansible Role: Ssl
+# Ansible Role: SSL
 
 ## Status
 
-[![Build Status](https://travis-ci.org/lordoftheflies/ssl.svg?branch=master)](https://travis-ci.org/lordoftheflies/ansible-role-ssl)
+[![Build Status](https://travis-ci.org/lordoftheflies/ansible-role-ssl.svg?branch=master)](https://travis-ci.org/lordoftheflies/ansible-role-ssl)
 
 ## Description
 
